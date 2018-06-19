@@ -8,7 +8,7 @@
             <input v-else class="todo-item-edit" type="text" v-model="todo.title" @blur="doneeEdit(todo)" @keyup.enter="doneEdit(todo)" v-focus>
          </div>
          <div class="remove-item" @click="removeTodo(index)">
-            <b>x</b>
+            &times;
          </div>
      </div>
 
@@ -31,6 +31,10 @@
 </template>
 
 <script>
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://127.0.0.1:8000/api'
+
 export default {
   name: 'todo-list',
   data () {
@@ -40,7 +44,7 @@ export default {
       beforeEditCache: '',
       filter: 'all',
       todos: [
-          {
+         /* {
               'id': 1,
               'title': 'Bathing',
               'completed': false,
@@ -52,8 +56,23 @@ export default {
               'completed': false,
               'editing': false,
           },
+          */
       ]
     }
+  },
+  created() {
+    axios.get('/todos')
+    .then(response => {
+      // JSON responses are automatically parsed.
+      this.todos = response.data
+    })
+    .catch(e => {
+      this.errors.push(e)
+    })
+
+  },
+  retrieveTodos(context, todos) {
+      this.todos = todos
   },
   computed: {
       remaining() {
@@ -84,7 +103,19 @@ export default {
   }
 },
   methods: {
-      addTodo(){
+      addTodo(todo){
+          let self = this;
+        axios.post('/todos', {
+            title: this.title,
+            completed: false,
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
+
           if (this.newTodo.trim().length == 0) {
               return  
           }
@@ -98,6 +129,16 @@ export default {
           this.idForTodo++
       },
       editTodo(todo) {
+          axios.post('/todos/' + id, {
+            title: todo.title,
+            completed: false,
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
           this.beforeEditCache = todo.title
           todo.editing = true
       },
@@ -107,8 +148,16 @@ export default {
           }
           todo.editing= false
       },
-      removeTodo(index) {
-          this.todos.splice(index, 1)
+      removeTodo(context, id) {
+          axios.delete('/todos/' + id)
+        .then(response => {
+            context.commit('removeTodo', id)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+
+         // this.todos.splice(index, 1)
       },
       checkAllTodos() {
         this.todos.forEach((todo) => todo.completed = event.target.checked)
@@ -196,9 +245,6 @@ export default {
 button {
     font-size: 14px;
     background-color: white;
-    appearance: none;
-
-
 }
 
 </style>

@@ -1,18 +1,16 @@
 <template>
   <div id="app" class="container">
-    <img src="./assets/logo.png" class="logo">
+    
     <todo-list></todo-list>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
 import TodoList from './components/TodoList'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
     TodoList,
   }
 }
@@ -40,9 +38,5 @@ export default {
   font-size: 20px;
 }
 
-.logo {
-  display: block;
-  margin: 20px auto;
-  height: 75px;
-}
+
 </style>
